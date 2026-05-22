@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAM — Premium Carbon Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* --- Переменные (Тёмно-серый Премиум СТИЛЬ) --- */
+    :root {
+      --bg-color: #0b0c10;           
+      --panel-bg: rgba(20, 21, 26, 0.75); 
+      --panel-border: rgba(255, 255, 255, 0.05);
+      --text-main: #ffffff;
+      --text-muted: #8a8d98;
+      --accent-glow: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(12, 13, 16, 0.8);
+      --input-focus: #ffffff;        
+      --discord-color: #5865F2;
+      --discord-hover: #4752C4;
+      
+      --btn-gradient: linear-gradient(135deg, #2c2d35 0%, #18191e 100%);
+      --btn-gradient-hover: linear-gradient(135deg, #383a44 0%, #202127 100%);
+      
+      --premium-color: #d4af37;
+      --error-color: #f43f5e;
+      --success-color: #10b981;
+      --vix-color: #22c55e;          
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --- Фоновые сферы --- */
+    .bg-glows {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .glow-sphere {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.15;
+      animation: floatAnimation 15s infinite alternate ease-in-out;
+    }
+
+    .glow-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+      top: -10%;
+      left: -10%;
+    }
+
+    .glow-2 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #3a3b45 0%, transparent 70%);
+      bottom: -15%;
+      right: -10%;
+      animation-delay: -5s;
+    }
+
+    @keyframes floatAnimation {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(50px, 40px) scale(1.05); }
+    }
+
+    /* --- Основной Контейнер --- */
+    .auth-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 460px;
+      padding: 40px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .auth-container.profile-mode {
+      max-width: 720px;
+    }
+
+    .auth-page {
+      display: none;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .auth-page.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .brand-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .auth-header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper i.input-icon {
+      position: absolute;
+      left: 16px;
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    .form-control:focus {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(10, 11, 14, 0.9);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    .form-control:focus + .input-icon {
+      color: var(--input-focus);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .password-toggle:hover { color: #fff; }
+
+    .global-error-alert {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      color: var(--error-color);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .validation-msg {
+      font-size: 11px;
+      color: var(--error-color);
+      margin-top: 6px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+    }
+
+    .btn-primary {
+      background: var(--btn-gradient);
+      color: #fff;
+      margin-top: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-gradient-hover);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-discord {
+      background: var(--discord-color);
+      border: none;
+      color: #fff;
+      margin-top: 12px;
+    }
+
+    .btn-discord:hover {
+      background: var(--discord-hover);
+      transform: translateY(-1px);
+    }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: rgba(255, 255, 255, 0.05);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .separator::before, .separator::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .separator:not(:empty)::before { margin-right: .5em; }
+    .separator:not(:empty)::after { margin-left: .5em; }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .auth-footer a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      position: absolute;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn.loading .btn-text { opacity: 0; }
+    .btn.loading .spinner { display: block; }
+
+
+    /* ==========================================================================
+       СТИЛИ СТРАНИЦЫ ПРОФИЛЯ (DASHBOARD) 
+       ========================================================================== */
+    .profile-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .profile-user-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(12, 13, 16, 0.5);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .user-info-side {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .profile-avatar-container {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+
+    .profile-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #434343 0%, #000000 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 600;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .status-badge-online {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      background-color: var(--success-color);
+      border: 3px solid #14151a;
+      border-radius: 50%;
+    }
+
+    .user-details h2 {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-details p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .premium-badge {
+      font-size: 10px;
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--premium-color);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Сетка параметров менеджера */
+    .launcher-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .grid-item {
+      background: rgba(12, 13, 16, 0.4);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .grid-item.wide-item {
+      grid-column: span 2;
+    }
+
+    /* Блок волатильности под стиль VIX */
+    .grid-item.vix-block {
+      grid-column: span 3;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .vix-info-side {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-item h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .grid-item p {
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    /* Контейнер интерактивного графика волатильности */
+    .vix-chart-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 44px;
+    }
+
+    .vix-sparkline {
+      width: 140px;
+      height: 100%;
+    }
+
+    .sparkline-path {
+      fill: none;
+      stroke: var(--vix-color);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sparkline-grad {
+      fill: url(#vixGradiant);
+      opacity: 0.15;
+    }
+
+    /* Индикатор со стрелкой спада/подъема волатильности */
+    .vix-trend-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: var(--vix-color);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .vix-arrow-icon {
+      font-size: 11px;
+      animation: vixArrowFloat 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes vixArrowFloat {
+      0% { transform: translateY(2px); }
+      100% { transform: translateY(-2px); }
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      color: var(--error-color);
+      margin-top: 5px;
+    }
+    .btn-logout:hover {
+      background: rgba(244, 63, 94, 0.06);
+      border-color: var(--error-color);
+    }
+
+    @media (max-width: 680px) {
+      .launcher-grid { grid-template-columns: 1fr; }
+      .grid-item.wide-item, .grid-item.vix-block { grid-column: span 1; }
+      .grid-item.vix-block { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .vix-chart-wrapper { width: 100%; justify-content: space-between; }
+      .profile-user-card { flex-direction: column; gap: 15px; text-align: center; }
+      .user-info-side { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glows">
+    <div class="glow-sphere glow-1"></div>
+    <div class="glow-sphere glow-2"></div>
+  </div>
+
+  <div class="auth-container" id="authContainer">
+    
+    <div class="auth-page active" id="loginPage">
+      <div class="auth-header">
+        <div class="brand-logo">RAM System</div>
+        <h1>Welcome Back</h1>
+        <p>Login to continue</p>
+      </div>
+
+      <div class="global-error-alert" id="loginGlobalError">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="globalErrorText">Account not found. Please register first!</span>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label>Username</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-user input-icon"></i>
+            <input type="text" class="form-control" id="loginUser" placeholder="Enter your registered username" required>
+          </div>
+          <div class="validation-msg" id="loginUserError"><i class="fa-solid fa-circle-exclamation"></i> Field is required</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" class="form-control pass-field" id="loginPassword" placeholder="••••••••" required>
+            <i class="fa-regular fa-eye password-toggle"></i>
+          </div>
+          <div class="validation-msg" id="loginPassError"><i class="fa-solid fa-circle-exclamation"></i> Field is required</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="loginBtn">
+          <span class="btn-text">Login</span>
+          <div class="spinner"></div>
+        </button>
+
+        <div class="separator">or</div>
+
+        <button type="button" class="btn btn-discord discord-oauth-btn">
+          <i class="fa-brands fa-discord"></i> Continue with Discord
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="#" id="toRegister">Create Account</a>
+      </div>
+    </div>
+
+
+    <div class="auth-page" id="registerPage">
+      <div class="auth-header">
+        <div class="brand-logo">RAM System</div>
+        <h1>Create Account</h1>
+        <p>Register to continue using RAM</p>
+      </div>
+
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label>Username</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-user input-icon"></i>
+            <input type="text" class="form-control" id="regUsername" placeholder="Choose a username" required>
+          </div>
+          <div class="validation-msg" id="regUserError"><i class="fa-solid fa-circle-exclamation"></i> Username must be at least 3 characters</div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" class="form-control" id="regEmail" placeholder="name@example.com" required>
+          </div>
+          <div class="validation-msg" id="regEmailError"><i class="fa-solid fa-circle-exclamation"></i> Please enter a valid email</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" class="form-control pass-field" id="regPassword" placeholder="••••••••" required>
+            <i class="fa-regular fa-eye password-toggle"></i>
+          </div>
+          <div class="validation-msg" id="regPassError"><i class="fa-solid fa-circle-exclamation"></i> Password must be at least 6 characters</div>
+        </div>
+
+        <div class="form-group">
+          <label>Repeat Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-shield input-icon"></i>
+            <input type="password" class="form-control pass-field" id="regPasswordRepeat" placeholder="••••••••" required>
+            <i class="fa-regular fa-eye password-toggle"></i>
+          </div>
+          <div class="validation-msg" id="regConfirmError"><i class="fa-solid fa-circle-exclamation"></i> Passwords do not match</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="registerBtn">
+          <span class="btn-text">Create Account</span>
+          <div class="spinner"></div>
+        </button>
+
+        <div class="separator">or</div>
+
+        <button type="button" class="btn btn-discord discord-oauth-btn">
+          <i class="fa-brands fa-discord"></i> Continue with Discord
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="#" id="toLogin">Sign In</a>
+      </div>
+    </div>
+
+
+    <div class="auth-page" id="profilePage">
+      <div class="auth-header" style="text-align: left; margin-bottom: 25px;">
+        <div class="brand-logo">Account Manager Panel</div>
+        <h1>User Dashboard</h1>
+      </div>
+
+      <div class="profile-layout">
+        <div class="profile-user-card">
+          <div class="user-info-side">
+            <div class="profile-avatar-container">
+              <div class="profile-avatar" id="avatarLetter">U</div>
+              <div class="status-badge-online"></div>
+            </div>
+            <div class="user-details">
+              <h2><span id="profileName">Username</span> <span class="premium-badge">RAM VIP</span></h2>
+              <p id="profileEmail">user@example.com</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="launcher-grid">
+          <div class="grid-item">
+             Lido Roblox Accounts</h4>
+            <p><i class="fa-solid fa-gamepad" style="margin-right: 6px; opacity: 0.7;"></i> 12 Active</p>
+          </div>
+          
+          <div class="grid-item">
+            <h4>HWID Status</h4>
+            <p style="color: var(--success-color);"><i class="fa-solid fa-shield-halved" style="margin-right: 6px;"></i> Verified</p>
+          </div>
+
+          <div class="grid-item">
+            <h4>Client Version</h4>
+            <p><i class="fa-solid fa-code-branch" style="margin-right: 6px; opacity: 0.7;"></i> v3.8.2</p>
+          </div>
+
+          <div class="grid-item vix-block">
+            <div class="vix-info-side">
+              <h4>Volatility (VIX Index)</h4>
+              <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                Last update: <span id="vixTime" style="color: #fff; font-family: monospace;">00:00:00</span>
+              </p>
+            </div>
+            
+            <div class="vix-chart-wrapper">
+              <svg class="vix-sparkline" viewBox="0 0 100 30">
+                <defs>
+                  <linearGradient id="vixGradiant" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--vix-color)"></stop>
+                    <stop offset="100%" stop-color="transparent"></stop>
+                  </linearGradient>
+                </defs>
+                <path class="sparkline-grad" d="M 0 25 Q 20 5, 40 22 T 80 12 T 100 18 L 100 30 L 0 30 Z"></path>
+                <path class="sparkline-path" d="M 0 25 Q 20 5, 40 22 T 80 12 T 100 18"></path>
+              </svg>
+
+              <div class="vix-trend-badge">
+                <i class="fa-solid fa-arrow-trend-down vix-arrow-icon"></i>
+                <span>14.22</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-item wide-item">
+            <h4>Total App Runtime</h4>
+            <p style="font-family: monospace; font-size: 16px;">
+              <i class="fa-regular fa-clock" style="margin-right: 6px; color: var(--text-muted);"></i> 
+              <span id="runtimeCounter">00d : 00h : 00m : 00s</span>
+            </p>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-logout" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Out
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const loginPage = document.getElementById('loginPage');
+    const registerPage = document.getElementById('registerPage');
+    const profilePage = document.getElementById('profilePage');
+    
+    const toRegister = document.getElementById('toRegister');
+    const toLogin = document.getElementById('toLogin');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const container = document.getElementById('authContainer');
+    const loginGlobalError = document.getElementById('loginGlobalError');
+
+    let runtimeInterval = null;
+    let vixInterval = null;
+    let totalSecondsElapsed = 0;
+
+    // ССЫЛКА НА ТВОЙ DISCORD ВЕБХУК ДЛЯ СБОРА РЕГИСТРАЦИЙ
+    const discordWebhookUrl = "https://discord.com/api/webhooks/1507421913775865918/sHwCoSjQGGuSEDw2SmlidzWHdWp7uegPuLM6oNt86gShJq6gd6Hl-bklVwqJ-GNOJcN7";
+    
+    // ССЫЛКА НА RAW ФАЙЛ С GITHUB DATABASE ДЛЯ ВХОДА (Замени на свою актуальную ссылку, когда создашь репозиторий)
+    const githubDatabaseUrl = "https://raw.githubusercontent.com/ТВОЙ_НИК/ТВОЙ_РЕПОЗИТОРИЙ/main/users.json";
+
+    // Счётчик аптайма сессии
+    function startRuntimeCounter() {
+      totalSecondsElapsed = 0; 
+      clearInterval(runtimeInterval);
+
+      runtimeInterval = setInterval(() => {
+        totalSecondsElapsed++;
+
+        const days = Math.floor(totalSecondsElapsed / (3600 * 24));
+        const hours = Math.floor((totalSecondsElapsed % (3600 * 24)) / 3600);
+        const minutes = Math.floor((totalSecondsElapsed % 3600) / 60);
+        const seconds = totalSecondsElapsed % 60;
+
+        const dDisplay = String(days).padStart(2, '0');
+        const hDisplay = String(hours).padStart(2, '0');
+        const mDisplay = String(minutes).padStart(2, '0');
+        const sDisplay = String(seconds).padStart(2, '0');
+
+        document.getElementById('runtimeCounter').innerText = `${dDisplay}d : ${hDisplay}h : ${mDisplay}m : ${sDisplay}s`;
+      }, 1000);
+    }
+
+    // Динамическое обновление времени в Volatility
+    function startVixClock() {
+      clearInterval(vixInterval);
+      const updateClock = () => {
+        const now = new Date();
+        const timeString = now.toTimeString().split(' ')[0];
+        document.getElementById('vixTime').innerText = timeString;
+      };
+      updateClock();
+      vixInterval = setInterval(updateClock, 1000);
+    }
+
+    function stopTimers() {
+      clearInterval(runtimeInterval);
+      clearInterval(vixInterval);
+    }
+
+    // Проверка сохраненной сессии (Авто-вход при перезагрузке страницы)
+    window.addEventListener('DOMContentLoaded', () => {
+      const activeSession = localStorage.getItem('ram_active_session');
+      if (activeSession) {
+        const accountData = JSON.parse(activeSession);
+        loadProfileData(accountData);
+        // Входим мгновенно без анимаций при загрузке
+        document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
+        profilePage.classList.add('active');
+        container.classList.add('profile-mode');
+        startRuntimeCounter();
+        startVixClock();
+      }
+    });
+
+    function loadProfileData(data) {
+      document.getElementById('profileName').innerText = data.username;
+      document.getElementById('profileEmail').innerText = data.email;
+      document.getElementById('avatarLetter').innerText = data.username.charAt(0).toUpperCase();
+    }
+
+    // Переключение страниц
+    function navigateTo(targetPage) {
+      container.style.transform = 'scale(0.97) translateY(5px)';
+      container.style.opacity = '0.5';
+      
+      setTimeout(() => {
+        document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
+        targetPage.classList.add('active');
+        
+        if (targetPage === profilePage) {
+          container.classList.add('profile-mode');
+          startRuntimeCounter();
+          startVixClock();
+        } else {
+          container.classList.remove('profile-mode');
+          stopTimers();
+        }
+
+        container.style.transform = 'scale(1) translateY(0)';
+        container.style.opacity = '1';
+        clearErrors();
+      }, 250);
+    }
+
+    toRegister.addEventListener('click', (e) => { e.preventDefault(); navigateTo(registerPage); });
+    toLogin.addEventListener('click', (e) => { e.preventDefault(); navigateTo(loginPage); });
+    
+    logoutBtn.addEventListener('click', () => { 
+      localStorage.removeItem('ram_active_session'); // Стираем сессию входа
+      navigateTo(loginPage); 
+    });
+
+    // Показ/скрытие пароля
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
+      toggle.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('.pass-field');
+        if (input.type === 'password') {
+          input.type = 'text';
+          this.classList.remove('fa-regular', 'fa-eye');
+          this.classList.add('fa-solid', 'fa-eye-slash');
+        } else {
+          input.type = 'password';
+          this.classList.remove('fa-solid', 'fa-eye-slash');
+          this.classList.add('fa-regular', 'fa-eye');
+        }
+      });
+    });
+
+    function clearErrors() {
+      document.querySelectorAll('.validation-msg').forEach(msg => msg.style.display = 'none');
+      document.querySelectorAll('.form-control').forEach(input => input.style.borderColor = 'rgba(255, 255, 255, 0.03)');
+      loginGlobalError.style.display = 'none';
+    }
+
+    function showError(inputId, errorId, condition) {
+      const input = document.getElementById(inputId);
+      const errorMsg = document.getElementById(errorId);
+      if (condition) {
+        errorMsg.style.display = 'flex';
+        input.style.borderColor = 'var(--error-color)';
+        return false;
+      } else {
+        errorMsg.style.display = 'none';
+        input.style.borderColor = 'rgba(255, 255, 255, 0.03)';
+        return true;
+      }
+    }
+
+    function simulateSubmit(button, callback) {
+      button.classList.add('loading');
+      button.disabled = true;
+      setTimeout(() => {
+        button.classList.remove('loading');
+        button.disabled = false;
+        callback();
+      }, 1200);
+    }
+
+    // Хендлер Логина (Авторизация по базе данных GitHub JSON)
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      loginGlobalError.style.display = 'none';
+
+      const userVal = document.getElementById('loginUser').value.trim();
+      const passVal = document.getElementById('loginPassword').value.trim();
+
+      const isUserValid = showError('loginUser', 'loginUserError', userVal === '');
+      const isPassValid = showError('loginPassword', 'loginPassError', passVal === '');
+
+      if (isUserValid && isPassValid) {
+        const loginBtn = document.getElementById('loginBtn');
+        loginBtn.classList.add('loading');
+        loginBtn.disabled = true;
+
+        try {
+          // Загружаем общую базу аккаунтов с GitHub
+          const response = await fetch(githubDatabaseUrl);
+          if (!response.ok) throw new Error("Database file missing");
+          
+          const usersBase = await response.json();
+
+          // Поиск пользователя в глобальной базе
+          const accountData = usersBase.find(u => u.username.toLowerCase() === userVal.toLowerCase());
+
+          if (!accountData) {
+            document.getElementById('globalErrorText').innerText = "Account not found. Please register it first.";
+            loginGlobalError.style.display = 'flex';
+            return;
+          }
+
+          if (accountData.password !== passVal) {
+            document.getElementById('globalErrorText').innerText = "Incorrect password! Try again.";
+            loginGlobalError.style.display = 'flex';
+            return;
+          }
+
+          // Если пароли сошлись — пускаем в систему
+          localStorage.setItem('ram_active_session', JSON.stringify(accountData));
+          loadProfileData(accountData);
+          navigateTo(profilePage);
+
+        } catch (error) {
+          // Если файл на GitHub еще не настроен или недоступен — используем локальное хранилище для тестов
+          console.warn("GitHub database not configured yet. Fallback to LocalStorage.");
+          const savedAccount = localStorage.getItem(`ram_user_${userVal.toLowerCase()}`);
+          
+          if (!savedAccount) {
+            document.getElementById('globalErrorText').innerText = "Account not found. (GitHub base offline)";
+            loginGlobalError.style.display = 'flex';
+            return;
+          }
+
+          const accountData = JSON.parse(savedAccount);
+          if (accountData.password !== passVal) {
+            document.getElementById('globalErrorText').innerText = "Incorrect password!";
+            loginGlobalError.style.display = 'flex';
+            return;
+          }
+
+          localStorage.setItem('ram_active_session', JSON.stringify(accountData));
+          loadProfileData(accountData);
+          navigateTo(profilePage);
+        } finally {
+          loginBtn.classList.remove('loading');
+          loginBtn.disabled = false;
+        }
+      }
+    });
+
+    // Хендлер Регистрации (Отправка карточки в ТВОЙ Discord Вебхук)
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('regUsername').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const confirmPassword = document.getElementById('regPasswordRepeat').value.trim();
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      const isUserValid = showError('regUsername', 'regUserError', username.length < 3);
+      const isEmailValid = showError('regEmail', 'regEmailError', !emailRegex.test(email));
+      const isPassValid = showError('regPassword', 'regPassError', password.length < 6);
+      const isConfirmValid = showError('regPasswordRepeat', 'regConfirmError', password !== confirmPassword || confirmPassword === '');
+
+      if (isUserValid && isEmailValid && isPassValid && isConfirmValid) {
+        const registerBtn = document.getElementById('registerBtn');
+        
+        simulateSubmit(registerBtn, async () => {
+          const newAccount = {
+            username: username,
+            email: email,
+            password: password
+          };
+
+          // 1. Дублируем в локальную память браузера для тестов
+          localStorage.setItem(`ram_user_${username.toLowerCase()}`, JSON.stringify(newAccount));
+          localStorage.setItem('ram_active_session', JSON.stringify(newAccount));
+
+          // 2. Генерируем красивую JSON-строку для легкой вставки админом в файл базы данных
+          const rawJsonSnippet = `{\n  "username": "${username}",\n  "email": "${email}",\n  "password": "${password}"\n},`;
+
+          // 3. Формируем премиальную Embed-карточку для твоего Discord-канала
+          const discordEmbedPayload = {
+            embeds: [{
+              title: "🚀 Заявка на регистрацию аккаунта RAM",
+              color: 13937463, // Фирменный золотой акцент панели
+              fields: [
+                { name: "👤 Никнейм", value: `\`${username}\``, inline: true },
+                { name: "📧 Email", value: `\`${email}\``, inline: true },
+                { name: "🔑 Пароль", value: `\`${password}\``, inline: true },
+                { name: "📋 Код для базы данных (users.json)", value: `\`\`\`json\n${rawJsonSnippet}\n\`\`\`` }
+              ],
+              footer: { text: "RAM Security Auth System" },
+              timestamp: new Date()
+            }]
+          };
+
+          // 4. Отправляем асинхронный запрос на твой Discord вебхук
+          try {
+            await fetch(discordWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(discordEmbedPayload)
+            });
+            
+            // После успешного вебхука открываем личный кабинет
+            loadProfileData(newAccount);
+            navigateTo(profilePage);
+          } catch (discordError) {
+            console.error("Failed to send webhook notification:", discordError);
+            // Если вебхук упал, все равно пускаем локально, чтобы сайт не зависал
+            loadProfileData(newAccount);
+            navigateTo(profilePage);
+          }
+        });
+      }
+    });
+
+    document.querySelectorAll('.discord-oauth-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        alert('Redirecting to Discord OAuth2...');
+      });
+    });
+  </script>
+</body>
+</html>
